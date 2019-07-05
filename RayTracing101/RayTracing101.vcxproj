@@ -146,10 +146,12 @@
     <ClCompile Include="BitMap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RayVectors.cpp" />
+    <ClCompile Include="VectorsCustom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitMap.h" />
     <ClInclude Include="RayVectors.h" />
+    <ClInclude Include="VectorsCustom.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,45 +1,31 @@
 #include "BitMap.h"
 
-BitMap::BitMap(const char* fileName)
+BitMap::BitMap()
 {
-	bitmapFileHeaderSize = 14;
-	bitmapInfoHeaderSize = 40;
-	height = 720;
-	width = 1268;
-	bytesPerPixel = 3;
-	this->fileName = fileName;
-	padding = (4 - (width * bytesPerPixel) % 4) % 4;
 }
 
-BitMap::BitMap(int height, int width, int bytesPerPixel, const char* fileName)
-{
-	this->height = height;
-	this->width = width;
-	this->bytesPerPixel = bytesPerPixel;
-	bitmapFileHeaderSize = 14;
-	bitmapInfoHeaderSize = 40;
-	this->fileName = fileName;
-	padding = (4 - (width * bytesPerPixel) % 4) % 4;
-}
+
 
 BitMap::~BitMap()
 {
 
 }
 
-void BitMap::generateBitmap(unsigned char* image)
+void BitMap::generateBitmapWithCharArray(unsigned char* image, const char* fileName, int height, int width, int bytesPerPixel, int dpi)
 {
+	unsigned char paddingData[3] = { 0, 0, 0 };
+	int paddingSize = (4 - (width * bytesPerPixel) % 4) % 4;
 	FILE* imageFile;
 	errno_t returnValue = fopen_s(&imageFile, fileName, "wb");
 	short charSize = sizeof(unsigned char);
 	if(returnValue == 0)
 	{ 
-		fwrite(createBitMapFileHeader(), charSize, bitmapFileHeaderSize, imageFile);
-		fwrite(createBitMapInfoHeader(), charSize, bitmapInfoHeaderSize, imageFile);
+		fwrite(createBitMapFileHeader(height, width, bytesPerPixel, paddingSize), charSize, bitmapFileHeaderSize, imageFile);
+		fwrite(createBitMapInfoHeader(height, width, bytesPerPixel, dpi), charSize, bitmapInfoHeaderSize, imageFile);
 		for (int i = 0; i < height; i++)
 		{
 			fwrite(image + (i * width * bytesPerPixel), bytesPerPixel, width, imageFile);
-			fwrite(paddingData, charSize, padding, imageFile);
+			fwrite(paddingData, charSize, paddingSize, imageFile);
 		}
 		fclose(imageFile);
 	}
@@ -50,9 +36,42 @@ void BitMap::generateBitmap(unsigned char* image)
 	
 }
 
-unsigned char* BitMap::createBitMapFileHeader()
+void BitMap::generateBitmapWithRGB(RGBType* data, const char* fileName, int height, int width, int bytesPerPixel, int dpi)
 {
-	int totalFileSize = bitmapFileHeaderSize + bitmapInfoHeaderSize + (bytesPerPixel * width + padding) * height;
+	unsigned char paddingData[3] = { 0, 0, 0 };
+	int paddingSize = (4 - (width * bytesPerPixel) % 4) % 4;
+	FILE* imageFile;
+	errno_t returnValue = fopen_s(&imageFile, fileName, "wb");
+	short charSize = sizeof(unsigned char);
+	if (returnValue == 0)
+	{
+		fwrite(createBitMapFileHeader(height, width, bytesPerPixel, paddingSize), charSize, bitmapFileHeaderSize, imageFile);
+		fwrite(createBitMapInfoHeader(height, width, bytesPerPixel, dpi), charSize, bitmapInfoHeaderSize, imageFile);
+		for (int i = 0; i < height * width; i++)
+		{
+			double red = data[i].R;
+			double blue = data[i].B;
+			double green = data[i].G;
+			unsigned char color[3] = { (unsigned char)(blue), (unsigned char)(green), (unsigned char)(red) };
+			fwrite(color, charSize, bytesPerPixel, imageFile);
+			if ((height * width) % width == 0)
+			{
+				fwrite(paddingData, charSize, paddingSize, imageFile);// Todo: May break this function, check, padding firstly after every row is drawn
+			}
+		}
+		fclose(imageFile);
+	}
+	else {
+		printf("Unable to access file %s", fileName);
+	}
+
+
+}
+
+
+unsigned char* BitMap::createBitMapFileHeader(int height, int width, int bytesPerPixel, int paddingSize)
+{
+	int totalFileSize = bitmapFileHeaderSize + bitmapInfoHeaderSize + (bytesPerPixel * width + paddingSize) * height;
 	static unsigned char fileHeader[] =
 	{
 		0, 0,	// signature
@@ -73,8 +92,9 @@ unsigned char* BitMap::createBitMapFileHeader()
 }
 
 
-unsigned char* BitMap::createBitMapInfoHeader()
+unsigned char* BitMap::createBitMapInfoHeader(int height, int width, int bytesPerPixel, int dpi)
 {
+	int ppm = dpi * 40; //Todo: mess around with this value to see the result
 	static unsigned char infoHeader[] =
 	{
 		0,0,0,0, //header size
@@ -101,6 +121,14 @@ unsigned char* BitMap::createBitMapInfoHeader()
 	infoHeader[11] = (unsigned char)(height>>24);
 	infoHeader[12] = (unsigned char)(1);
 	infoHeader[14] = (unsigned char)(bytesPerPixel * 8);
+	infoHeader[25] = (unsigned char)(ppm    );
+	infoHeader[26] = (unsigned char)(ppm>>8 );
+	infoHeader[27] = (unsigned char)(ppm>>16);
+	infoHeader[28] = (unsigned char)(ppm>>24);
+	infoHeader[29] = (unsigned char)(ppm);
+	infoHeader[30] = (unsigned char)(ppm >> 8);
+	infoHeader[31] = (unsigned char)(ppm >> 16);
+	infoHeader[32] = (unsigned char)(ppm >> 24);
 
 	return infoHeader;
 }

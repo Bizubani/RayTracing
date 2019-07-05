@@ -2,28 +2,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include<cmath>
+
+struct RGBType {
+	double R;
+	double B;
+	double G;
+};
+
 
 class BitMap
 {
 public:
-	BitMap(const char* fileName);
-	BitMap(int height, int width, int bytesPerPixel, const char* fileName);
+	BitMap();
 	~BitMap();
-	void generateBitmap(unsigned char* image); // generates bitmap and saves it to a file
-	unsigned char* createBitMapFileHeader(); // generates the header info for the bitmap file
-	unsigned char* createBitMapInfoHeader(); // generates the  file info for the bitmap file
+	static void generateBitmapWithCharArray(unsigned char* image, const char* fileName, int height, int width, int bytesPerPixel, int dpi); // generates bitmap and saves it to a file
+	static void generateBitmapWithRGB(RGBType* data, const char* fileName, int height, int width, int bytesPerPixel, int dpi); // generates bitmap and saves it to a file
+
 	
 private:
-	int bitmapFileHeaderSize; // the size of the File Header
-	int bitmapInfoHeaderSize; // the size of the Info Header
-	int bytesPerPixel; // defaults to 3 unless otherwise specified
-	int height; // image height as specified by user
-	int width; // image width as specified by user
-	int padding; // creates a padding value between  0  - 3
-	const char* fileName; // the file name used to save the file
-	unsigned char paddingData[3] = { 0, 0, 0 };
+	static unsigned char* createBitMapFileHeader(int height, int width, int bytesPerPixel, int paddingSize); // generates the header info for the bitmap file
+	static unsigned char* createBitMapInfoHeader(int height, int width, int bytesPerPixel, int dpi); // generates the  file info for the bitmap file
+	static const int bitmapFileHeaderSize = 14; // the size of the File Header
+	static const int bitmapInfoHeaderSize = 40; // the size of the Info Header
 };
-
 
 
 
