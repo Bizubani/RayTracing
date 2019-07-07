@@ -49,9 +49,9 @@ void BitMap::generateBitmapWithRGB(RGBType* data, const char* fileName, int heig
 		fwrite(createBitMapInfoHeader(height, width, bytesPerPixel, dpi), charSize, bitmapInfoHeaderSize, imageFile);
 		for (int i = 0; i < height * width; i++)
 		{
-			double red = data[i].R;
-			double blue = data[i].B;
-			double green = data[i].G;
+			float red = data[i].R;
+			float blue = data[i].B;
+			float green = data[i].G;
 			unsigned char color[3] = { (unsigned char)(blue), (unsigned char)(green), (unsigned char)(red) };
 			fwrite(color, charSize, bytesPerPixel, imageFile);
 			if ((height * width) % width == 0)

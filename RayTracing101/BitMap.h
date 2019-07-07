@@ -5,9 +5,9 @@
 #include<cmath>
 
 struct RGBType {
-	double R;
-	double B;
-	double G;
+	float R;
+	float B;
+	float G;
 };
 
 

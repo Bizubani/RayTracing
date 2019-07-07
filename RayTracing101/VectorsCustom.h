@@ -3,34 +3,34 @@
 
 inline float sqr (float n) { return n * n; }
 
-struct Vectors
+struct Vector
 {
 	float x, y, z;
 
-	Vectors(); //default constructor
-	Vectors(float x, float y, float z); // user defined constructor
-	Vectors(const Vectors & v); // copy constructor
-	Vectors(float f); // singled variable constructor
+	Vector(); //default constructor
+	Vector(float x, float y, float z); // user defined constructor
+	Vector(const Vector & v); // copy constructor
+	Vector(float f); // singled variable constructor
 
 	inline float lengthSquared();
 	inline float length();
 
-	float normalize();
-	Vectors normalized();
+	float normalize(); // normalize the current vector. Works in place.
+	Vector normalized(); // return a copy of the current vector that has been normalized
 
-	float dotProduct(Vectors v, Vectors u);
-	Vectors crossProduct(Vectors v, Vectors u);
+	float dotProduct(Vector v); // calculate the dot product of the current vector dot v
+	Vector crossProduct(Vector v); // calculate the cross product of the current vector cross v
 
-	virtual ~Vectors(); // deconstructor
+	virtual ~Vector(); // deconstructor
 
-	Vectors& operator = (const Vectors& v);
-	Vectors& operator +=(const Vectors& v);
-	Vectors& operator -=(const Vectors& v);
-	Vectors& operator /=(float f);
-	Vectors& operator *=(float f);
-	Vectors operator -() const;
+	Vector& operator = (const Vector& v);
+	Vector& operator +=(const Vector& v);
+	Vector& operator -=(const Vector& v);
+	Vector& operator /=(float f);
+	Vector& operator *=(float f);
+	Vector operator -() const;
 
 };
 
-typedef Vectors Point;
+typedef Vector Point;
 

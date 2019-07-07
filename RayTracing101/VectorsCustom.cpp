@@ -1,26 +1,26 @@
 #include "VectorsCustom.h"
 
-Vectors::Vectors() : x(0.0), y(1.0), z(0.0){}
+Vector::Vector() : x(0.0), y(0.0), z(0.0){}
 
-Vectors::Vectors(float x, float y, float z) : x(x), y(y), z(z) {}
+Vector::Vector(float x, float y, float z) : x(x), y(y), z(z) {}
 
-Vectors::Vectors(const Vectors& v) : x(v.x), y(v.y), z(v.z) {}
+Vector::Vector(const Vector& v) : x(v.x), y(v.y), z(v.z) {}
 
-Vectors::Vectors(float f) : x(f), y(f), z(f) {}
+Vector::Vector(float f) : x(f), y(f), z(f) {}
 
-Vectors::~Vectors() {}
+Vector::~Vector() {}
 
-inline float Vectors::lengthSquared()
+inline float Vector::lengthSquared()
 {
 	return sqr(x) + sqr(y) + sqr(z); // return the sum of the squares of each axis
 }
 
-inline float Vectors::length() 
+inline float Vector::length() 
 { 
 	return sqrt(lengthSquared()); // return the square root of the sum of squares
 }
 
-float Vectors::normalize()
+float Vector::normalize()
 {
 	float vectorLength = length();
 	
@@ -29,16 +29,16 @@ float Vectors::normalize()
 	return vectorLength;
 } // normalize the current vector
 
-Vectors Vectors::normalized()
+Vector Vector::normalized()
 {
-	Vectors v(*this);
+	Vector v(*this);
 
 	v.normalize();
 
 	return v;
 } // create a copy of the current vector, normalize it and return the value
 
-Vectors& Vectors::operator =(const Vectors& v)
+Vector& Vector::operator =(const Vector& v)
 {
 	x = v.x;
 	y = v.y;
@@ -47,7 +47,7 @@ Vectors& Vectors::operator =(const Vectors& v)
 	return *this;
 }// assign one vector to another
 
-Vectors& Vectors::operator+= (const Vectors& v)
+Vector& Vector::operator+= (const Vector& v)
 {
 	x += v.x;
 	y += v.y;
@@ -56,7 +56,7 @@ Vectors& Vectors::operator+= (const Vectors& v)
 	return *this;
 } // add a vector to this vector
 
-Vectors& Vectors::operator-= (const Vectors& v)
+Vector& Vector::operator-= (const Vector& v)
 {
 	x -= v.x;
 	y -= v.y;
@@ -64,7 +64,7 @@ Vectors& Vectors::operator-= (const Vectors& v)
 	return *this;
 } // subtract a vector form this vector
 
-Vectors& Vectors::operator*= (float f)
+Vector& Vector::operator*= (float f)
 {
 	x *= f;
 	y *= f;
@@ -73,7 +73,7 @@ Vectors& Vectors::operator*= (float f)
 	return *this;
 } // scalar multiplication
 
-Vectors& Vectors::operator/= (float f)
+Vector& Vector::operator/= (float f)
 {
 	x /= f;
 	y /= f;
@@ -82,50 +82,50 @@ Vectors& Vectors::operator/= (float f)
 	return *this;
 } // used in normalization of vectors
 
-Vectors Vectors::operator-() const
+Vector Vector::operator-() const
 {
-	return Vectors(-x, -y, -z);
+	return Vector(-x, -y, -z);
 } // reverse the vector by multipling all axises by -1
 
-float Vectors::dotProduct(Vectors v, Vectors u)
+float Vector::dotProduct(Vector v)
 {
-	return v.x * u.x + v.y * u.y + v.z * u.z;
+	return v.x * x + v.y * y + v.z * z;
 }
 
-Vectors Vectors::crossProduct(Vectors v, Vectors u)
+Vector Vector::crossProduct(Vector v)
 {
-	return Vectors(
-		v.y * u.z - v.z * u.y, // calculate value of x
-		v.z * u.x - v.x * u.z, // calculate value of y
-		v.x * u.y - v.y * u.x); // calculate value of z
+	return Vector(
+		v.y * z - v.z * y, // calculate value of x
+		v.z * x - v.x * z, // calculate value of y
+		v.x * y - v.y * x); // calculate value of z
 }
 
-inline Vectors operator +(const Vectors& v, const Vectors& u)
+inline Vector operator +(const Vector& v, const Vector& u)
 {
-	return Vectors(v.x + u.x, v.y + u.y, v.z + u.z);
+	return Vector(v.x + u.x, v.y + u.y, v.z + u.z);
 } // sum two vectors and return a new vector
 
-inline Vectors operator - (const Vectors& v, const Vectors& u)
+inline Vector operator - (const Vector& v, const Vector& u)
 {
-	return Vectors(v.x - u.x, v.y - u.y, v.z - u.z);
+	return Vector(v.x - u.x, v.y - u.y, v.z - u.z);
 } //take the difference of two vectors and return a new vector
 
-inline Vectors operator *(const Vectors& v, const float f)
+inline Vector operator *(const Vector& v, const float f)
 {
-	return Vectors(v.x * f, v.y * f, v.z * f);
-}
+	return Vector(v.x * f, v.y * f, v.z * f);
+} //scale a vector v by f
 
-inline Vectors operator *(const float f, const Vectors& v)
+inline Vector operator *(const float f, const Vector& v)
 {
-	return Vectors(v.x * f, v.y * f, v.z * f);
-}
+	return Vector(v.x * f, v.y * f, v.z * f);
+} // scale a vector v by f
 
-inline Vectors operator /(const Vectors& v, const float f)
+inline Vector operator /(const Vector& v, const float f)
 {
-	return Vectors(v.x / f, v.y / f, v.z / f);
-}
+	return Vector(v.x / f, v.y / f, v.z / f);
+} //shrink a vector by f
 
-inline Vectors operator /(const float f, const Vectors& v)
+inline Vector operator /(const float f, const Vector& v)
 {
-	return Vectors(v.x / f, v.y / f, v.z / f);
-}
+	return Vector(f / v.x, f /v.y, f / v.z);
+} 
