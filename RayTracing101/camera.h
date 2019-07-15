@@ -6,6 +6,8 @@ struct Camera
 	Vector camPosition, camDirection, camRight, camDown;
 
 	Camera();
-	Camera(Vector position, Vector direction, Vector right, Vector down);
+	Camera(const Vector& target, const Vector& cameraPositon);
+	Camera(const Vector& position, const Vector& direction, const Vector& right, const Vector& down);
+	virtual ~Camera();
 };
 

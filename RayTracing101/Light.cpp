@@ -5,5 +5,7 @@ Color::Color(float red, float blue, float green, float special) : red(red), blue
 Color::Color(const Color& color) : red(color.red), blue(color.blue), green(color.green), special(color.special) {}
 
 Light::Light() : position(Vector(0.0, 0.0, 0.0)), lightColor(Color()) {}
-Light::Light(Vector position, Color lightColor) : position(position), lightColor(lightColor) {}
+Light::Light(const Vector& position, const Color& lightColor) : position(position), lightColor(lightColor) {}
 Light::Light(const Light& lightSource) : position(lightSource.position), lightColor(lightSource.lightColor) {}
+
+Light::~Light(){}

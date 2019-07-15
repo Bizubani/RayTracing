@@ -100,32 +100,4 @@ Vector Vector::crossProduct(Vector v)
 		v.x * y - v.y * x); // calculate value of z
 }
 
-inline Vector operator +(const Vector& v, const Vector& u)
-{
-	return Vector(v.x + u.x, v.y + u.y, v.z + u.z);
-} // sum two vectors and return a new vector
 
-inline Vector operator - (const Vector& v, const Vector& u)
-{
-	return Vector(v.x - u.x, v.y - u.y, v.z - u.z);
-} //take the difference of two vectors and return a new vector
-
-inline Vector operator *(const Vector& v, const float f)
-{
-	return Vector(v.x * f, v.y * f, v.z * f);
-} //scale a vector v by f
-
-inline Vector operator *(const float f, const Vector& v)
-{
-	return Vector(v.x * f, v.y * f, v.z * f);
-} // scale a vector v by f
-
-inline Vector operator /(const Vector& v, const float f)
-{
-	return Vector(v.x / f, v.y / f, v.z / f);
-} //shrink a vector by f
-
-inline Vector operator /(const float f, const Vector& v)
-{
-	return Vector(f / v.x, f /v.y, f / v.z);
-} 
