@@ -11,7 +11,7 @@ struct Color
 	Color(const Color& color); // copy a color object
 
 	float brightness();
-	
+	void clip(); // adjust the color values to keep them within the range of 0 - 1
 	Color& operator *(float scalar);
 	Color& operator +=(const Color& additive);
 	Color& operator /(float divisor);

@@ -6,6 +6,47 @@ Color::Color(const Color& color) : red(color.red), blue(color.blue), green(color
 
 float Color::brightness(){	return (red + blue + green) / 3;}
 
+
+void Color::clip()
+{
+	float totalRGB = red + blue + green;
+	float excessLight = totalRGB - 3.0f;
+
+	if (excessLight > 0)
+	{	
+		red = red + excessLight * (red / totalRGB);
+		blue = blue + excessLight * (blue / totalRGB);
+		green = green + excessLight * (green / totalRGB);
+	}
+	///after shifting the color values, if they are still outside the valid ranges, shift them to their maximun
+	if (red > 1)
+	{
+		red = 1;
+	}		
+	if (green > 1)
+	{
+		green = 1;
+	}
+	if (blue > 1)
+	{
+		blue = 1;
+	}
+
+	///or their minimum as appropriate
+	if (red < 0)
+	{
+		red = 0;
+	}
+	if (green < 0)
+	{
+		green = 0;
+	}
+	if (blue < 0)
+	{
+		blue = 0;
+	}
+}
+
 Color& Color::operator*(float scalar)
 {
 	red *= scalar;

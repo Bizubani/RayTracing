@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	Camera sceneCamera(lookTowards, currentCameraPosition);
 
 	Color whiteLight(1.0f, 1.0f, 1.0f, 0.0f);
-	Color prettyBlue(0.5f, 0.5f, 1.0f, 0.3f);
+	Color prettyBlue(0.3f, 1.0f, 0.2f, 0.3f);
 	Color pureRed(1.0f, 0.0f, 0.0f, 0.0f);
 	Color gray(0.5f, 0.5f, 0.5f, 0.0f);
 	Color someColor(0.5f, 0.25f, 0.30f, 0.0f);
@@ -99,9 +99,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-
-
-	BitMap::generateBitmapWithRGB(imageData, "With light and shadows and specular.bmp", height, width, BYTESPERPIXEL, 72);
+	BitMap::generateBitmapWithRGB(imageData, "Blue Sphere with highlights.bmp", height, width, BYTESPERPIXEL, 72);
 	//generateColorGradient(255, 0, 0, height, width);
 
 	free(imageData);
@@ -218,8 +216,7 @@ Color getIntersectingColor(const Intersection& intersect, const float ambientLig
 				}
 			}
 		}
-		
-
 	}
+	returnColor.clip();// address coloring issues if they exist.
 	return returnColor;
 }
