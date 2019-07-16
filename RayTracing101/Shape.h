@@ -12,9 +12,11 @@ public:
 	virtual bool doesItIntersect(const Ray& ray) = 0; // creates abstract member function that will simply check whether a ray has intersected the shape
 	virtual Color getColor() = 0;
 	virtual ~Shape() {}
+	virtual Vector getNormal(const Vector& intersect) = 0;
 };
 
-class ShapeSet : public Shape
+//composite class to hold the shapes in the scene
+class ShapeSet
 {
 protected:
 	std::vector<Shape*> shapes;
@@ -22,7 +24,6 @@ protected:
 public:	
 	ShapeSet();
 	virtual ~ShapeSet();
-	Color getColor(); // forced to instantiate from super class
 	void addShape(Shape* shape);
 	virtual bool findIntersect(Intersection& intersection);
 	virtual bool doesItIntersect(const Ray& ray);
@@ -34,6 +35,7 @@ protected:
 	Point position;// might be necessary to dot this with itself
 	Vector normalToTheSurface;
 	Color planeColor;
+
 	//Todo: consider changing to distance
 public:
 	Plane(const Point& position, const Vector& normal, Color color);
@@ -43,6 +45,7 @@ public:
 	virtual Color getColor();
 	virtual bool findIntersect(Intersection& intersection);
 	virtual bool doesItIntersect(const Ray& ray);
+	virtual Vector getNormal(const Vector& intersect);
 };
 
 class Sphere : public Shape
@@ -60,7 +63,7 @@ public:
 	Point getCenter();
 	
 	virtual ~Sphere();
-
+	virtual Vector getNormal(const Vector& intersect);
 	virtual bool findIntersect(Intersection& intersection);
 	virtual bool doesItIntersect(const Ray& ray);
 };

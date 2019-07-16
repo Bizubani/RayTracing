@@ -4,6 +4,9 @@ Ray::Ray() : origin(Vector()), direction(Vector(1.0,0.0,0.0)), rayMax(RAY_T_MAX)
 
 Ray::Ray(const Vector& v, const Vector& u) : origin(v), direction(u), rayMax(RAY_T_MAX) {}
 
+Ray::Ray(const Vector& origin, const Vector& direction, const float maxRaySize) : origin(origin), direction(direction), rayMax(maxRaySize) {}
+
+
 Ray::~Ray() {}
 
 Point Ray::calculateMove(float t) const

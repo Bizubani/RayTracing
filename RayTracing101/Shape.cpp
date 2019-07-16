@@ -3,8 +3,6 @@
 ShapeSet::ShapeSet() {}
 ShapeSet::~ShapeSet() {}
 
-Color ShapeSet::getColor() { return Color(); } //return a default color object
-
 void ShapeSet::addShape(Shape* shape)
 {
 	shapes.push_back(shape);
@@ -46,6 +44,11 @@ Plane::~Plane(){}
 
 Color Plane::getColor() { return planeColor; }
 
+Vector Plane::getNormal(const Vector& intersect)
+{
+	return normalToTheSurface;
+}
+
 bool Plane::findIntersect(Intersection& intersection)
 {
 	float rayDotNormal = dotProduct(intersection.ray.direction, normalToTheSurface);
@@ -82,7 +85,7 @@ bool Plane::doesItIntersect(const Ray& ray)
 	else
 	{
 		float t = dotProduct(position - ray.origin, normalToTheSurface) / rayDotNormal;
-		// if the distance to intersection is too small, or, if it's pass the theoritical length of the ray
+		// if the distance to intersection is too small, or, it's too large
 		if (t <= RAY_T_MIN || t >= ray.rayMax)
 		{			
 			return false;  // there is no intersection
@@ -98,10 +101,15 @@ Sphere::~Sphere(){}
 Point Sphere::getCenter() { return centerPoint; }
 Color Sphere::getColor() { return sphereColor; }
 
+Vector Sphere::getNormal(const Vector& intersect) 
+{
+	return intersect - centerPoint;
+}
+
 bool Sphere::findIntersect(Intersection& intersection)
 {
 	Ray localRay = intersection.ray;
-	localRay.origin -= centerPoint; // adjust the light ray to make it relative to the center point???? // Todo: Revise
+	localRay.origin -= centerPoint; // adjust the light ray to make it relative to the center point???? // Todo: Revise the mathematical theory
 
 	///find the coefficients of the quadratic
 	float a = localRay.direction.lengthSquared();
@@ -126,7 +134,7 @@ bool Sphere::findIntersect(Intersection& intersection)
 		{
 			intersection.t = t1;
 		}
-		else if (t2 > RAY_T_MIN && t2 < intersection.t) //Todo: consider if this should be two if statements.
+		else if (t2 > RAY_T_MIN && t2 < intersection.t) 
 		{
 			intersection.t = t2;
 		}

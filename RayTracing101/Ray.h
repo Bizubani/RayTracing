@@ -15,6 +15,7 @@ struct Ray
 
 	Ray();
 	Ray(const Vector& origin, const Vector& direction);
+	Ray(const Vector& origin, const Vector& direction, const float maxRaySize);
 	virtual ~Ray();
 
 	Point calculateMove(float t) const;

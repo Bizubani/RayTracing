@@ -65,6 +65,7 @@ inline Vector operator /(const float f, const Vector& v)
 }
 
 inline float dotProduct(const Vector& v, const Vector& u)
+
 {
 	return (v.x * u.x + v.y * u.y + v.z * u.z);
 }

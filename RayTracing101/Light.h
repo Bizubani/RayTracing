@@ -9,6 +9,12 @@ struct Color
 	Color(); // default color constructor
 	Color(float red, float blue, float green, float special); //user specified color settings
 	Color(const Color& color); // copy a color object
+
+	float brightness();
+	
+	Color& operator *(float scalar);
+	Color& operator +=(const Color& additive);
+	Color& operator /(float divisor);
 };
 
 
@@ -23,3 +29,12 @@ struct Light
 	virtual ~Light();
 };
 
+inline Color operator *(const Color& color1, const Color& color2)
+{
+	return Color(color1.red * color2.red, color1.blue * color2.blue, color1.green * color2.green, color1.special);
+}
+
+inline Color operator +(const Color& color1, const Color& color2)
+{
+	return Color(color1.red + color2.red, color1.blue + color2.blue, color1.green + color2.green, color1.special);
+}

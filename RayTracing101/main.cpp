@@ -9,36 +9,41 @@
 
 void generateColorGradient(int blueValue, int redValue, int greenValue, int height, int width);
 
+Color getIntersectingColor(const Intersection& intersect, const float ambientLight, const std::vector<Light*>& lights, ShapeSet& sceneObjects);
+
 int main(int argc, char* argv[])
 {
-	int height = 800;
-	int width = 800;
+	int height = 1200;
+	int width = 1200;
 	RGBType* imageData = (RGBType*) calloc(width * height, sizeof(RGBType));
 	float aspectRatio = (float) width / height;
-	Vector origin(0.0f, 0.5f, 0.0f);
-	Vector planePosition(0.0f,-1.0f, 0.0f); 
+	Vector origin(0.0f, 1.0f, 0.0f);
+	Vector planePosition(0.0f, -0.25f, 0.0f); 
 	Vector x(1.0, 0.0, 0.0);
 	Vector y(0.0, 1.0, 0.0);
 	Vector z(0.0, 0.0, 1.0);
-
+	float ambientLight = 0.40;
 	Point lookTowards; // create a point we that looks towards the origin
-	Vector currentCameraPosition(0.0f, 1.0f, -12.0f); // the current camera position
+	Vector currentCameraPosition(0.0f, 1.0f, -10.0f); // the current camera position
 	
 	Camera sceneCamera(lookTowards, currentCameraPosition);
 
 	Color whiteLight(1.0f, 1.0f, 1.0f, 0.0f);
-	Color prettyBlue(0.5f, 1.0f, 0.5f, 0.3f);
+	Color prettyBlue(0.25f, 1.0f, 0.1f, 0.3f);
 	Color pureRed(1.0f, 0.0f, 0.0f, 0.0f);
 	Color gray(0.5f, 0.5f, 0.5f, 0.0f);
-	Color someColor(0.5f, 0.75f, 0.3f, 0.0f);
+	Color someColor(0.5f, 0.25f, 0.30f, 0.0f);
 	Color black(0.0f, 0.0f, 0.0f, 0.0f);
 
-	Vector lightScenePosition( 7.0f, 10.0f, 10.0f);
+	/// Todo: try to abstract to light class
+	Vector lightScenePosition(2.0f, 5.0f, -7.0f);
 	Light sceneLight(lightScenePosition, whiteLight);
+	std::vector<Light*> lightSources;
+	lightSources.push_back(&sceneLight);
 
 	ShapeSet sceneObjects; // holds the objects in the scene
-	Sphere sceneSphere(origin, 1.75, prettyBlue); // create a default sphere for the scene
-	Plane scenePlane(planePosition,y, someColor); //Todo: place a plane just under the scene sphere. Double check
+	Sphere sceneSphere(origin, 1.25, prettyBlue); // create a default sphere for the scene
+	Plane scenePlane(planePosition, y, someColor); //Todo: place a plane just under the scene sphere. Double check
 	sceneObjects.addShape(&scenePlane);
 	sceneObjects.addShape(&sceneSphere);
 
@@ -78,18 +83,17 @@ int main(int argc, char* argv[])
 			Ray currentCameraRay(originOfRays, directionOfCurrentRay);// create the new ray to test
 
 			Intersection intersect(currentCameraRay);// create an intersection object with the current ray
-
 			///loop throught the shapeset and if there is an intesect with the current ray and an object in the scene
 			if (sceneObjects.findIntersect(intersect) == true)
 			{
-				Color objectColor = intersect.object->getColor(); // color the appropriate pixel the appropriate color
+
 				if(imageData != nullptr)
 				{
-					imageData[x * height + y].B = objectColor.blue * 255;
-					imageData[x * height + y].G = objectColor.green * 255;
-					imageData[x * height + y].R = objectColor.red * 255;
-				}
-				
+					Color colorAtIntersection = getIntersectingColor(intersect, ambientLight, lightSources, sceneObjects);
+					imageData[x * height + y].B = colorAtIntersection.blue * 255 ;
+					imageData[x * height + y].G = colorAtIntersection.green  * 255;
+					imageData[x * height + y].R = colorAtIntersection.red * 255;
+				}				
 			}
 			
 		}
@@ -97,7 +101,7 @@ int main(int argc, char* argv[])
 
 
 
-	BitMap::generateBitmapWithRGB(imageData, "imageText2.bmp", height, width, BYTESPERPIXEL, 72);
+	BitMap::generateBitmapWithRGB(imageData, "Without light and shadows4.bmp", height, width, BYTESPERPIXEL, 72);
 	//generateColorGradient(255, 0, 0, height, width);
 
 	free(imageData);
@@ -167,4 +171,40 @@ void generateColorGradient(int blueValue, int redValue, int greenValue, int heig
 	BitMap::generateBitmapWithRGB(mytype, imageFileName2, height, width, BYTESPERPIXEL, 72);
 	delete[] mytype;
 
+}
+
+Color getIntersectingColor(const Intersection& intersect, const float ambientLight, const std::vector<Light*>& lights, ShapeSet& sceneObjects)
+{
+	Color returnColor = intersect.object->getColor(); // the color of the object to manipulate
+	Vector intersectionPoint = intersect.ray.origin + intersect.ray.direction * intersect.t; // calculate from the intersection the point of intersection
+	Vector normalToIntersect = (intersect.object->getNormal(intersectionPoint)).normalized(); // the normal to the point of intersection
+	for (Light* light : lights)
+	{
+		Vector lightDirection = light->position - intersectionPoint;
+		Vector lightDirectionNorm = lightDirection.normalized();
+		// calculate the direction the light has to move in to make it to the intersection point
+		float cosineAngle = dotProduct(normalToIntersect, lightDirectionNorm);//since both vectors are normalized, so their dot product is equal to the cos of the angle between them.
+
+		if (cosineAngle > 0.0)
+		{
+			float distanceToLightSource = lightDirection.length(); // Todo: move shadow ray generation to light class
+			Ray shadowRay(intersectionPoint, lightDirectionNorm, distanceToLightSource);
+			Intersection shadowIntersects(shadowRay);
+
+			if (sceneObjects.findIntersect(shadowIntersects))
+			{
+				returnColor = returnColor * ambientLight  * cosineAngle ;				
+			}
+			else
+			{				
+				returnColor = returnColor * light->lightColor * (cosineAngle )*1.05;			
+			}
+		}
+		else 
+		{
+			returnColor = returnColor * ambientLight * -cosineAngle;
+		}
+
+	}
+	return returnColor;
 }
