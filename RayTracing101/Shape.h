@@ -11,6 +11,7 @@ public:
 	virtual bool findIntersect(Intersection& intersection) = 0; // creates abstract member function that will be implemented to calculate the intersection of the shape and the ray
 	virtual bool doesItIntersect(const Ray& ray) = 0; // creates abstract member function that will simply check whether a ray has intersected the shape
 	virtual Color getColor() = 0;
+	virtual void setColor(const Color& newColor) = 0;
 	virtual ~Shape() {}
 	virtual Vector getNormal(const Vector& intersect) = 0;
 };
@@ -43,6 +44,7 @@ public:
 
 	virtual ~Plane();
 	virtual Color getColor();
+	virtual void setColor(const Color& newColor);
 	virtual bool findIntersect(Intersection& intersection);
 	virtual bool doesItIntersect(const Ray& ray);
 	virtual Vector getNormal(const Vector& intersect);
@@ -60,6 +62,7 @@ public:
 	Sphere();
 	//add getters for centerPoint and color
 	virtual Color getColor();
+	virtual void setColor(const Color& newColor);
 	Point getCenter();
 	
 	virtual ~Sphere();

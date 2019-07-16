@@ -44,6 +44,13 @@ Plane::~Plane(){}
 
 Color Plane::getColor() { return planeColor; }
 
+void Plane::setColor(const Color& newColor) 
+{
+	planeColor.red = newColor.red; 
+	planeColor.blue = newColor.blue;
+	planeColor.green = newColor.green;
+}
+
 Vector Plane::getNormal(const Vector& intersect)
 {
 	return normalToTheSurface;
@@ -100,6 +107,12 @@ Sphere::~Sphere(){}
 
 Point Sphere::getCenter() { return centerPoint; }
 Color Sphere::getColor() { return sphereColor; }
+void Sphere::setColor(const Color& newColor)
+{
+	sphereColor.red = newColor.red;
+	sphereColor.blue = newColor.blue;
+	sphereColor.green = newColor.green;
+}
 
 Vector Sphere::getNormal(const Vector& intersect) 
 {
