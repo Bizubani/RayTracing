@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	Vector x(1.0, 0.0, 0.0);
 	Vector y(0.0, 1.0, 0.0);
 	Vector z(0.0, 0.0, 1.0);
-	float ambientLight = 0.25;
+	float ambientLight = 0.33;
 	Point lookTowards; // create a point we that looks towards the origin
 	Vector currentCameraPosition(0.0f, 1.0f, -7.0f); // the current camera position
 	
@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
 	Color prettyBlue(0.3f, 1.0f, 0.2f, 0.3f);
 	Color pureRed(1.0f, 0.0f, 0.0f, 0.0f);
 	Color gray(0.5f, 0.5f, 0.5f, 0.0f);
-	Color someColor(0.5f, 0.25f, 0.30f, 0.0f);
+	Color someColor(0.50f, 0.25f, 0.30f, 0.0f);
+	Color tiled(1.0f, 1.0f, 1.0f, 2.0f);
 	Color black(0.0f, 0.0f, 0.0f, 0.0f);
 
 	/// Todo: try to abstract to light class
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
 
 	ShapeSet sceneObjects; // holds the objects in the scene
 	Sphere sceneSphere(origin, 1.25, prettyBlue); // create a default sphere for the scene
-	Plane scenePlane(planePosition, y, someColor); //Todo: place a plane just under the scene sphere. Double check
+	Plane scenePlane(planePosition, y, tiled); //Todo: place a plane just under the scene sphere. Double check
 	sceneObjects.addShape(&scenePlane);
 	sceneObjects.addShape(&sceneSphere);
 
@@ -99,7 +100,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	BitMap::generateBitmapWithRGB(imageData, "Blue Sphere with highlights.bmp", height, width, BYTESPERPIXEL, 72);
+	BitMap::generateBitmapWithRGB(imageData, "Blue Sphere with highlights with checkerfloor.bmp", height, width, BYTESPERPIXEL, 72);
 	//generateColorGradient(255, 0, 0, height, width);
 
 	free(imageData);
@@ -173,8 +174,24 @@ void generateColorGradient(int blueValue, int redValue, int greenValue, int heig
 
 Color getIntersectingColor(const Intersection& intersect, const float ambientLight, const std::vector<Light*>& lights, ShapeSet& sceneObjects)
 {
-	Color returnColor = intersect.object->getColor() * ambientLight; // the color of the object to manipulate
-	Vector intersectionPoint = intersect.ray.origin + intersect.ray.direction * intersect.t; // calculate from the intersection the point of intersection
+	Color objectColor = intersect.object->getColor(); // the pure color of the object
+
+	Vector intersectionPoint = intersect.ray.origin + intersect.ray.direction * intersect.t; // calculate from the intersection the point of intersection	
+
+	if(objectColor.special == 2)
+	{
+		int squareSize = (int)floor(intersectionPoint.x) + floor(intersectionPoint.z);
+
+		if (squareSize % 2 == 0)
+		{
+			objectColor = Color(0.0f, 0.0f, 0.0f, 2.0f);
+		}
+		else
+		{
+			objectColor = Color(1.0f, 1.0f, 1.0f, 2.0f);
+		}
+	}
+	Color returnColor = objectColor * ambientLight;	// the color that will be returned
 	Vector normalToIntersect = (intersect.object->getNormal(intersectionPoint)).normalized(); // the normal to the point of intersection
 	for (Light* light : lights)
 	{
@@ -189,15 +206,11 @@ Color getIntersectingColor(const Intersection& intersect, const float ambientLig
 			Ray shadowRay(intersectionPoint, lightDirectionNorm, distanceToLightSource);
 			Intersection shadowIntersects(shadowRay);
 
-			if (sceneObjects.findIntersect(shadowIntersects))
-			{
-					
-			}
-			else
+			if (!sceneObjects.findIntersect(shadowIntersects))
 			{				
-				returnColor = returnColor + intersect.object->getColor() * light->lightColor * cosineAngle ;	
+				returnColor += objectColor * light->lightColor * cosineAngle ;	// this is non commutative and has interesting results when reversed
 
-				if (intersect.object->getColor().special > 0.0f && intersect.object->getColor().special < 1.0f)
+				if (objectColor.special > 0.0f && objectColor.special < 1.0f)
 				{
 					float objectDot = dotProduct(normalToIntersect, (-intersect.ray.direction));
 					Vector specialScalar = normalToIntersect * objectDot;
@@ -211,7 +224,7 @@ Color getIntersectingColor(const Intersection& intersect, const float ambientLig
 					{
 						specular = pow(specular, 10);
 						Color lightColor = light->lightColor;
-						returnColor += lightColor * specular * intersect.object->getColor().special;
+						returnColor += lightColor * specular * objectColor.special;
 					}
 				}
 			}

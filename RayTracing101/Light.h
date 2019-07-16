@@ -12,7 +12,7 @@ struct Color
 
 	float brightness();
 	void clip(); // adjust the color values to keep them within the range of 0 - 1
-	Color& operator *(float scalar);
+	
 	Color& operator +=(const Color& additive);
 	Color& operator /(float divisor);
 };
@@ -37,4 +37,14 @@ inline Color operator *(const Color& color1, const Color& color2)
 inline Color operator +(const Color& color1, const Color& color2)
 {
 	return Color(color1.red + color2.red, color1.blue + color2.blue, color1.green + color2.green, color1.special);
+}
+
+inline Color operator *(const Color& color, const float scalar)
+{
+	return Color(color.red * scalar, color.blue * scalar, color.green * scalar, color.special);
+}
+
+inline Color operator *(const float scalar, const Color& color)
+{
+	return Color(color.red * scalar, color.blue * scalar, color.green * scalar, color.special);
 }

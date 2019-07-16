@@ -47,14 +47,8 @@ void Color::clip()
 	}
 }
 
-Color& Color::operator*(float scalar)
-{
-	red *= scalar;
-	blue *= scalar;
-	green *= scalar;
 
-	return *this;
-}
+
 
 Color& Color::operator +=(const Color& additive)
 {
