@@ -22,21 +22,21 @@ int main(int argc, char* argv[])
 	Vector x(1.0, 0.0, 0.0);
 	Vector y(0.0, 1.0, 0.0);
 	Vector z(0.0, 0.0, 1.0);
-	float ambientLight = 0.40;
+	float ambientLight = 0.25;
 	Point lookTowards; // create a point we that looks towards the origin
-	Vector currentCameraPosition(0.0f, 1.0f, -10.0f); // the current camera position
+	Vector currentCameraPosition(0.0f, 1.0f, -7.0f); // the current camera position
 	
 	Camera sceneCamera(lookTowards, currentCameraPosition);
 
 	Color whiteLight(1.0f, 1.0f, 1.0f, 0.0f);
-	Color prettyBlue(0.25f, 1.0f, 0.1f, 0.3f);
+	Color prettyBlue(0.5f, 0.5f, 1.0f, 0.3f);
 	Color pureRed(1.0f, 0.0f, 0.0f, 0.0f);
 	Color gray(0.5f, 0.5f, 0.5f, 0.0f);
 	Color someColor(0.5f, 0.25f, 0.30f, 0.0f);
 	Color black(0.0f, 0.0f, 0.0f, 0.0f);
 
 	/// Todo: try to abstract to light class
-	Vector lightScenePosition(2.0f, 5.0f, -7.0f);
+	Vector lightScenePosition(7.0f, 8.0f, -7.0f);
 	Light sceneLight(lightScenePosition, whiteLight);
 	std::vector<Light*> lightSources;
 	lightSources.push_back(&sceneLight);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
 
 
-	BitMap::generateBitmapWithRGB(imageData, "Without light and shadows4.bmp", height, width, BYTESPERPIXEL, 72);
+	BitMap::generateBitmapWithRGB(imageData, "With light and shadows and specular.bmp", height, width, BYTESPERPIXEL, 72);
 	//generateColorGradient(255, 0, 0, height, width);
 
 	free(imageData);
@@ -175,7 +175,7 @@ void generateColorGradient(int blueValue, int redValue, int greenValue, int heig
 
 Color getIntersectingColor(const Intersection& intersect, const float ambientLight, const std::vector<Light*>& lights, ShapeSet& sceneObjects)
 {
-	Color returnColor = intersect.object->getColor(); // the color of the object to manipulate
+	Color returnColor = intersect.object->getColor() * ambientLight; // the color of the object to manipulate
 	Vector intersectionPoint = intersect.ray.origin + intersect.ray.direction * intersect.t; // calculate from the intersection the point of intersection
 	Vector normalToIntersect = (intersect.object->getNormal(intersectionPoint)).normalized(); // the normal to the point of intersection
 	for (Light* light : lights)
@@ -193,17 +193,32 @@ Color getIntersectingColor(const Intersection& intersect, const float ambientLig
 
 			if (sceneObjects.findIntersect(shadowIntersects))
 			{
-				returnColor = returnColor * ambientLight  * cosineAngle ;				
+					
 			}
 			else
 			{				
-				returnColor = returnColor * light->lightColor * (cosineAngle )*1.05;			
+				returnColor = returnColor + intersect.object->getColor() * light->lightColor * cosineAngle ;	
+
+				if (intersect.object->getColor().special > 0.0f && intersect.object->getColor().special < 1.0f)
+				{
+					float objectDot = dotProduct(normalToIntersect, (-intersect.ray.direction));
+					Vector specialScalar = normalToIntersect * objectDot;
+					Vector additive = specialScalar + intersect.ray.direction;
+					Vector specialScalar2 = additive * 2;
+					Vector additive2 = specialScalar2 - intersect.ray.direction;
+					Vector reflectionDirection = additive2.normalized();
+
+					float specular = dotProduct(reflectionDirection, lightDirectionNorm);
+					if (specular > 0)
+					{
+						specular = pow(specular, 10);
+						Color lightColor = light->lightColor;
+						returnColor += lightColor * specular * intersect.object->getColor().special;
+					}
+				}
 			}
 		}
-		else 
-		{
-			returnColor = returnColor * ambientLight * -cosineAngle;
-		}
+		
 
 	}
 	return returnColor;
