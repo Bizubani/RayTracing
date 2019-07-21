@@ -19,24 +19,24 @@ int main(int argc, char* argv[])
 {
 	clock_t startTime, endTime, currentTime, processTime;
 	startTime = clock();
-	int height = 1200;
+	int height = 1600;
 	int width = 1200;
 	RGBType* imageData = (RGBType*) calloc(width * height, sizeof(RGBType));
 	float aspectRatio = (float) width / height;
 	Vector origin(0.0f, 1.0f, 0.0f);
-	Vector secondSpherePlace(2.0f, 1.0f, -7.0f);
+	Vector secondSpherePlace(2.0f, 1.0f, -2.0f);
 	Vector planePosition(0.0f, -0.25f, 0.0f); 
-	Vector wallPosition(0.0f, 0.0f, 15.0f);
+	Vector wallPosition(0.0f, 0.0f, 7.0f);
 	Vector x(1.0, 0.0, 0.0);
 	Vector y(0.0, 1.0, 0.0);
 	Vector z(0.0, 0.0, 1.0);
 	float ambientLight = 0.33;
 	Point lookTowards; // create a point we that looks towards the origin
-	Vector currentCameraPosition(0.0f, 1.0f, -14.0f); // the current camera position
+	Vector currentCameraPosition(0.0f, 4.0f, -7.0f); // the current camera position
 	
 	Camera sceneCamera(lookTowards, currentCameraPosition);
 
-	Color whiteLight(1.0f, 1.0f, 1.0f, 0.1f);
+	Color whiteLight(1.0f, 1.0f, 1.0f, 0.0f);
 	Color prettyBlue(0.3f, 1.0f, 0.2f, 0.66f);
 	Color pureRed(1.0f, 0.0f, 0.0f, 0.7f);
 	Color gray(0.5f, 0.5f, 0.5f, 0.80f);
@@ -45,13 +45,13 @@ int main(int argc, char* argv[])
 	Color black(0.0f, 0.0f, 0.0f, 0.0f);
 
 	/// Todo: try to abstract to light class
-	Vector lightScenePosition(7.0f, 8.0f, -7.0f);
+	Vector lightScenePosition(7.0f, 8.0f, 5.0f);
 	Vector secondSceneLight(-7.0f, 8.0f, 12.0f);
 	Light secondLight(secondSceneLight, whiteLight);
 	Light sceneLight(lightScenePosition, whiteLight);
 	std::vector<Light*> lightSources;
 	lightSources.push_back(&sceneLight);
-	lightSources.push_back(&secondLight);
+	//lightSources.push_back(&secondLight);
 
 	ShapeSet sceneObjects; // holds the objects in the scene
 	Sphere sceneSphere(origin, 1.25, prettyBlue); // create a default sphere for the scene
@@ -106,9 +106,9 @@ int main(int argc, char* argv[])
 				if(imageData != nullptr)
 				{
 					Color colorAtIntersection = getIntersectingColor(intersect, ambientLight, lightSources, sceneObjects);
-					imageData[x * height + y].B = colorAtIntersection.blue * 255 ;
-					imageData[x * height + y].G = colorAtIntersection.green  * 255;
-					imageData[x * height + y].R = colorAtIntersection.red * 255;
+					imageData[currentPixel].B = colorAtIntersection.blue * 255 ;
+					imageData[currentPixel].G = colorAtIntersection.green  * 255;
+					imageData[currentPixel].R = colorAtIntersection.red * 255;
 				}				
 			}
 			
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 	currentTime = clock();
 	std::cout << "Rendering took: " << (currentTime - processTime)/1000.0f << " seconds." << std::endl;
 	std::cout << "Beginning generation of the bitmap image" << std::endl;
-	BitMap::generateBitmapWithRGB(imageData, "Gray and blue shperes with a wall and one light", height, width, BYTESPERPIXEL, 72);
+	BitMap::generateBitmapWithRGB(imageData, "Changed2.bmp", height, width, BYTESPERPIXEL, 72);
 	//generateColorGradient(255, 0, 0, height, width);
 	free(imageData);
 	endTime = clock();

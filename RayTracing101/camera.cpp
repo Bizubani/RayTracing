@@ -9,7 +9,7 @@ Camera::~Camera() {}
 Camera::Camera(const Vector& target, const Vector& cameraPosition) : camPosition(cameraPosition)
 {
 	camDirection = (target - cameraPosition).normalized();
-	camRight = crossProduct(camDirection, Vector(1.0f, 0.0f, 0.0f)).normalized();
+	camRight = crossProduct(camDirection, Vector(0.0f, 1.0f, 0.0f)).normalized();
 	camDown = crossProduct(camRight, camDirection);
-	//camDown = -camDown; // switch camera orientation from up to down.
+	camDown = -camDown; // switch camera orientation from up to down.
 }
